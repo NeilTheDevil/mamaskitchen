@@ -1,3 +1,4 @@
+# Deploys frontend/*.html to https://<user>.github.io/mamaskitchen/
 name: Deploy frontend to GitHub Pages
 
 on:
