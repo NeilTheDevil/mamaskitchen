@@ -1,0 +1,109 @@
+{
+  "name": "Food: Get Order (GET /order?o=...)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "order",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "55d9dfa7-ecc4-42f0-ae53-c6fd12d24f50",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 300],
+      "webhookId": "ad1e5d79-fd3e-4276-be4f-e5e7aec77070"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT order_number, customer_name, customer_phone, delivery_address, notes, items, total_amount, status, created_at, updated_at\nFROM orders\nWHERE order_number = $1\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ $json.query.o }}"
+        }
+      },
+      "id": "f93f6adc-c04f-45b7-b3e4-f16730cdeb26",
+      "name": "Lookup Order",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [460, 300],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\nif (rows.length === 0 || !rows[0].json || !rows[0].json.order_number) {\n  return [{ json: { _notFound: true } }];\n}\nreturn [{ json: rows[0].json }];"
+      },
+      "id": "8097e570-2cd6-4fed-a84a-3ef5541ef1ef",
+      "name": "Handle Not Found",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "notfound-check",
+              "leftValue": "={{ $json._notFound }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "249e36c1-311e-486d-99ea-a3e57ff8fc28",
+      "name": "Not Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"Order not found\" }",
+        "options": { "responseCode": 404 }
+      },
+      "id": "9192babf-7f99-47cc-bffc-87bf32dcd339",
+      "name": "Respond 404",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "id": "31f48954-66e8-417e-a989-e56ee7ee7d75",
+      "name": "Respond Order",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1120, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Lookup Order", "type": "main", "index": 0 }]]
+    },
+    "Lookup Order": {
+      "main": [[{ "node": "Handle Not Found", "type": "main", "index": 0 }]]
+    },
+    "Handle Not Found": {
+      "main": [[{ "node": "Not Found?", "type": "main", "index": 0 }]]
+    },
+    "Not Found?": {
+      "main": [
+        [{ "node": "Respond 404", "type": "main", "index": 0 }],
+        [{ "node": "Respond Order", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "tags": []
+}

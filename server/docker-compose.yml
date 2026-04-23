@@ -1,0 +1,60 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /srv/food:/srv/food:ro
+      - caddy_data:/data
+    environment:
+      - N8N_DOMAIN=${N8N_DOMAIN}
+      - FOOD_DOMAIN=${FOOD_DOMAIN}
+    depends_on:
+      - n8n
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    environment:
+      - N8N_HOST=${N8N_DOMAIN}
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - WEBHOOK_URL=https://${N8N_DOMAIN}/
+      - GENERIC_TIMEZONE=Africa/Lagos
+      - N8N_SECURE_COOKIE=true
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - ADMIN_SECRET=${ADMIN_SECRET}
+      - FOOD_DB_HOST=postgres
+      - FOOD_DB_PORT=5432
+      - FOOD_DB_NAME=${POSTGRES_DB}
+      - FOOD_DB_USER=${POSTGRES_USER}
+      - FOOD_DB_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  n8n_data:
+  caddy_data:
+  postgres_data:

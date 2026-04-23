@@ -1,0 +1,69 @@
+{
+  "name": "Food: Order Intake (POST /order)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "dd1a2060-26e3-4e8b-a6e6-2de652713fc3",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 300],
+      "webhookId": "d404ec87-96db-44d0-b6e3-2b9bb1ad155f"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || {};\n\nconst chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';\nlet suffix = '';\nfor (let i = 0; i < 6; i++) suffix += chars[Math.floor(Math.random() * chars.length)];\nconst order_number = 'MK-' + suffix;\n\nconst items = Array.isArray(body.items) ? body.items : [];\nif (items.length === 0) throw new Error('Cart is empty');\n\nconst total_amount = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.qty)), 0);\n\nreturn [{\n  json: {\n    order_number,\n    customer_name: String(body.customer_name || '').trim(),\n    customer_phone: String(body.customer_phone || '').trim(),\n    delivery_address: String(body.delivery_address || '').trim(),\n    notes: body.notes ? String(body.notes).trim() : null,\n    items_json: JSON.stringify(items),\n    total_amount\n  }\n}];"
+      },
+      "id": "188b3430-d3ee-45af-9935-bfd64577259a",
+      "name": "Prepare Order",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO orders (order_number, customer_name, customer_phone, delivery_address, notes, items, total_amount)\nVALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)\nRETURNING order_number, created_at;",
+        "options": {
+          "queryReplacement": "={{ $json.order_number }},={{ $json.customer_name }},={{ $json.customer_phone }},={{ $json.delivery_address }},={{ $json.notes }},={{ $json.items_json }},={{ $json.total_amount }}"
+        }
+      },
+      "id": "1aa032a5-4dc1-462a-8eee-b2f6bb42f14b",
+      "name": "Insert Order",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"order_number\": \"{{ $json.order_number }}\",\n  \"tracking_url\": \"/track.html?o={{ $json.order_number }}\"\n}",
+        "options": {}
+      },
+      "id": "529f8207-6818-4278-af5d-33c34dc4c170",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Prepare Order", "type": "main", "index": 0 }]]
+    },
+    "Prepare Order": {
+      "main": [[{ "node": "Insert Order", "type": "main", "index": 0 }]]
+    },
+    "Insert Order": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "tags": []
+}

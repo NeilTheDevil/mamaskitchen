@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track Your Order — Mama's Kitchen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .step-dot { transition: all .3s ease; }
+        .step-active .step-dot { background: #d97706; color: white; transform: scale(1.15); }
+        .step-done .step-dot { background: #059669; color: white; }
+        .step-done .step-line { background: #059669; }
+        .step-active .step-line { background: linear-gradient(to right, #059669 50%, #e7e5e4 50%); }
+        @keyframes pulse-ring { 0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.5)} 50%{box-shadow:0 0 0 8px rgba(217,119,6,0)} }
+        .step-active .step-dot { animation: pulse-ring 1.8s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-900 min-h-screen">
+    <header class="bg-gradient-to-br from-amber-600 to-rose-600 text-white">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+            <a href="/" class="text-amber-100 text-sm hover:text-white">&larr; Back to menu</a>
+            <h1 class="brand-font text-4xl font-black mt-2">Track your order</h1>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 py-10">
+        <div id="lookup-form" class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <label class="block text-sm font-medium text-stone-700 mb-2">Order number</label>
+            <div class="flex gap-2">
+                <input id="order-input" placeholder="MK-XXXXXX"
+                    class="flex-1 border border-stone-300 rounded-lg px-4 py-3 uppercase tracking-wider font-mono focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" />
+                <button id="lookup-btn"
+                    class="bg-amber-600 text-white font-semibold px-6 rounded-lg hover:bg-amber-700">
+                    Track
+                </button>
+            </div>
+            <p id="lookup-error" class="hidden mt-3 text-rose-600 text-sm"></p>
+        </div>
+
+        <div id="status-card" class="hidden bg-white rounded-xl shadow-sm p-6">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-stone-500 text-sm">Order</p>
+                <span id="status-order-number" class="brand-font text-2xl font-black text-amber-700"></span>
+            </div>
+            <p id="status-placed-at" class="text-stone-500 text-sm mb-8"></p>
+
+            <div class="relative mb-10">
+                <div class="flex justify-between">
+                    <div id="step-received" class="flex-1 flex flex-col items-center relative">
+                        <div class="step-dot w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center font-bold z-10">1</div>
+                        <p class="text-xs text-stone-600 mt-2 text-center">Received</p>
+                    </div>
+                    <div id="step-preparing" class="flex-1 flex flex-col items-center relative">
+                        <div class="step-dot w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center font-bold z-10">2</div>
+                        <p class="text-xs text-stone-600 mt-2 text-center">Preparing</p>
+                    </div>
+                    <div id="step-out_for_delivery" class="flex-1 flex flex-col items-center relative">
+                        <div class="step-dot w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center font-bold z-10">3</div>
+                        <p class="text-xs text-stone-600 mt-2 text-center">Out for delivery</p>
+                    </div>
+                    <div id="step-delivered" class="flex-1 flex flex-col items-center relative">
+                        <div class="step-dot w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center font-bold z-10">4</div>
+                        <p class="text-xs text-stone-600 mt-2 text-center">Delivered</p>
+                    </div>
+                </div>
+                <div class="absolute top-5 left-[12.5%] right-[12.5%] h-1 bg-stone-200 -z-0"></div>
+                <div id="progress-bar" class="absolute top-5 left-[12.5%] h-1 bg-emerald-600 transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div class="border-t pt-5">
+                <p id="current-status-text" class="text-xl font-bold text-stone-900"></p>
+                <p id="current-status-sub" class="text-stone-500 mt-1"></p>
+            </div>
+
+            <div class="mt-6 pt-5 border-t">
+                <h4 class="font-semibold mb-3">Order summary</h4>
+                <ul id="status-items" class="space-y-2 text-sm text-stone-700"></ul>
+                <div class="flex justify-between mt-4 pt-4 border-t font-bold">
+                    <span>Total</span>
+                    <span id="status-total"></span>
+                </div>
+            </div>
+
+            <p class="text-xs text-stone-400 mt-6 text-center">Page refreshes automatically every 15 seconds.</p>
+        </div>
+    </main>
+
+    <script src="/app.js"></script>
+    <script src="/track.js"></script>
+</body>
+</html>
