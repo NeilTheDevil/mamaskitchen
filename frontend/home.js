@@ -58,7 +58,42 @@ const saveProfile = (p) => localStorage.setItem('mk-profile-v1', JSON.stringify(
 const formatNaira = (n) => '₦' + Number(n).toLocaleString('en-NG', { maximumFractionDigits: 0 });
 
 // Renderers (filled in later tasks).
-function renderTopBar() {}
+function renderTopBar() {
+    const profile = getProfile();
+    const address = profile.delivery_address || DEFAULT_ADDRESS;
+    const count = getCartCount();
+
+    $('top-bar').innerHTML = `
+        <div class="max-w-[1200px] mx-auto px-5 pt-1.5 pb-3.5 flex items-center justify-between">
+            <button id="address-btn" type="button" class="text-left hover:opacity-80 transition-opacity">
+                <div class="mono uppercase tracking-[0.12em] text-[10px]" style="color: var(--ink-3)">Deliver to</div>
+                <div class="flex items-center gap-1.5 text-base font-semibold mt-0.5" style="color: var(--ink)">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span id="address-text">${address}</span>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                </div>
+            </button>
+            <a id="cart-btn" href="menu.html" class="relative w-10 h-10 rounded-full flex items-center justify-center"
+                style="background: var(--surface); border: 1px solid var(--rule); color: var(--ink)">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                ${count > 0 ? `
+                    <span class="absolute -top-0.5 -right-0.5 w-[18px] h-[18px] rounded-full text-[10px] font-semibold flex items-center justify-center"
+                        style="background: var(--accent); color: var(--accent-ink)">${count}</span>
+                ` : ''}
+            </a>
+        </div>
+    `;
+
+    $('address-btn').addEventListener('click', () => {
+        const next = prompt('Delivery address', address);
+        if (next && next.trim() && next.trim() !== address) {
+            const p = getProfile();
+            p.delivery_address = next.trim();
+            saveProfile(p);
+            $('address-text').textContent = next.trim();
+        }
+    });
+}
 function renderSearch() {}
 function renderHero() {}
 function renderCuisines() {}
