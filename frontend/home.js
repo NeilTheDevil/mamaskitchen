@@ -190,7 +190,32 @@ function renderCuisines() {
         });
     });
 }
-function renderFilters() {}
+function renderFilters() {
+    $('filters-section').innerHTML = `
+        <div class="max-w-[1200px] mx-auto pb-4">
+            <div class="scroll-x flex gap-2 px-5">
+                ${FILTERS.map((f, idx) => {
+                    const primary = f.primary;
+                    const style = primary
+                        ? 'background: var(--ink); color: var(--bg); border-color: var(--ink);'
+                        : 'background: var(--surface); border-color: var(--rule); color: var(--ink-2);';
+                    return `
+                        <button data-filter-idx="${idx}" type="button" class="pill hover:opacity-90 transition-opacity" style="${style}">
+                            ${f.icon ? `<i data-lucide="${f.icon}" class="w-3.5 h-3.5"></i>` : ''}
+                            <span>${f.label}</span>
+                        </button>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+    document.querySelectorAll('[data-filter-idx]').forEach((b) => {
+        b.addEventListener('click', () => {
+            const idx = Number(b.getAttribute('data-filter-idx'));
+            console.log('filter toggled:', FILTERS[idx].label, '(placeholder — no active filter state yet)');
+        });
+    });
+}
 function renderRestaurants() {}
 function renderBottomNav() {}
 
