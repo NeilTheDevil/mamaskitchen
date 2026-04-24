@@ -169,6 +169,23 @@ if (document.getElementById('menu-grid')) {
                 customer_phone: form.get('customer_phone'),
                 delivery_address: form.get('delivery_address'),
             });
+
+            // Persist a snapshot for the home page's "Order it again?" hero card.
+            const totalAmount = items.reduce((s, it) => s + Number(it.price) * Number(it.qty), 0);
+            const topItem = items.slice().sort((a, b) => b.qty - a.qty)[0];
+            const summary = topItem
+                ? (items.length === 1 ? topItem.name : `${topItem.name} + ${items.length - 1} more`)
+                : 'your last order';
+            localStorage.setItem('mk-last-order', JSON.stringify({
+                order_number: res.order_number,
+                items,
+                total: totalAmount,
+                timestamp: new Date().toISOString(),
+                restaurant: 'Iya Bisi Kitchen',
+                summary,
+                tracking_url: `track.html?o=${encodeURIComponent(res.order_number)}`,
+            }));
+
             cart = {};
             saveCart(cart);
             renderCart();
@@ -218,6 +235,12 @@ if (document.getElementById('menu-grid')) {
 
             renderMenu();
             renderCart();
+
+            // Auto-open checkout when arriving from home page's "Reorder" flow.
+            if (new URLSearchParams(location.search).get('checkout') === '1'
+                && Object.keys(cart).length > 0) {
+                $('checkout-btn').click();
+            }
         } catch (err) {
             $('menu-loading-error').classList.remove('hidden');
             $('menu-loading-error').textContent = 'Menu unavailable: ' + err.message;
