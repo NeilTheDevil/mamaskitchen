@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .brand-font { font-family: 'Playfair Display', serif; }
@@ -22,7 +24,7 @@
 <body class="bg-stone-50 text-stone-900 min-h-screen">
     <header class="bg-gradient-to-br from-amber-600 to-rose-600 text-white">
         <div class="max-w-3xl mx-auto px-6 py-10">
-            <a href="/" class="text-amber-100 text-sm hover:text-white">&larr; Back to menu</a>
+            <a href="./" class="text-amber-100 text-sm hover:text-white">&larr; Back to menu</a>
             <h1 class="brand-font text-4xl font-black mt-2">Track your order</h1>
         </div>
     </header>
@@ -76,6 +78,15 @@
                 <p id="current-status-sub" class="text-stone-500 mt-1"></p>
             </div>
 
+            <div id="map-section" class="hidden mt-6 pt-5 border-t">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-semibold">Rider location</h4>
+                    <span id="map-updated" class="text-xs text-stone-500"></span>
+                </div>
+                <div id="map" class="w-full h-72 rounded-lg overflow-hidden bg-stone-100"></div>
+                <p id="map-note" class="text-xs text-stone-500 mt-2"></p>
+            </div>
+
             <div class="mt-6 pt-5 border-t">
                 <h4 class="font-semibold mb-3">Order summary</h4>
                 <ul id="status-items" class="space-y-2 text-sm text-stone-700"></ul>
@@ -89,7 +100,7 @@
         </div>
     </main>
 
-    <script src="/app.js"></script>
-    <script src="/track.js"></script>
+    <script src="app.js"></script>
+    <script src="track.js"></script>
 </body>
 </html>

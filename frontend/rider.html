@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mama's Kitchen — Rider</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .pulse { animation: pulse 1.2s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+    </style>
+</head>
+<body class="bg-stone-50 min-h-screen text-stone-900">
+    <header class="bg-gradient-to-br from-amber-600 to-rose-600 text-white">
+        <div class="max-w-md mx-auto px-6 py-8">
+            <p class="text-amber-100 tracking-widest uppercase text-xs font-semibold">Rider mode</p>
+            <h1 class="brand-font text-3xl font-black mt-1">Mama's Kitchen</h1>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto px-6 py-8 space-y-6">
+        <div id="missing-params" class="hidden bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-4">
+            <p class="font-semibold">Invalid link</p>
+            <p class="text-sm mt-1">This page expects <code>?o=MK-XXX&amp;key=...</code> in the URL. Open it from the admin "Copy rider link" button.</p>
+        </div>
+
+        <div id="job" class="hidden space-y-5">
+            <div class="bg-white rounded-xl border border-stone-200 p-5">
+                <p class="text-xs uppercase tracking-wide text-stone-500">Order</p>
+                <p id="order-number" class="brand-font text-3xl font-black text-amber-700">—</p>
+                <p class="text-xs uppercase tracking-wide text-stone-500 mt-4">Deliver to</p>
+                <p id="customer-line" class="font-semibold mt-1">—</p>
+                <p id="address-line" class="text-sm text-stone-600 mt-0.5 whitespace-pre-line">—</p>
+                <p id="notes-line" class="text-sm text-stone-500 italic mt-2 hidden"></p>
+            </div>
+
+            <div id="status-panel" class="bg-stone-900 text-white rounded-xl p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span id="status-dot" class="w-3 h-3 rounded-full bg-stone-500"></span>
+                        <span id="status-label" class="font-semibold">Not tracking</span>
+                    </div>
+                    <span id="ping-count" class="text-xs text-stone-400">0 pings</span>
+                </div>
+                <div id="coords" class="font-mono text-xs text-stone-400">—</div>
+                <div id="last-ping" class="text-xs text-stone-400">—</div>
+                <div id="error" class="hidden text-xs text-rose-300 bg-rose-900/30 rounded-lg p-2"></div>
+            </div>
+
+            <button id="toggle-btn"
+                class="w-full bg-amber-600 text-white font-semibold py-4 rounded-xl hover:bg-amber-700 text-lg">
+                Start tracking
+            </button>
+
+            <button id="mark-delivered-btn" class="hidden w-full bg-emerald-600 text-white font-semibold py-3 rounded-xl hover:bg-emerald-700">
+                Mark as delivered
+            </button>
+
+            <p class="text-xs text-stone-500 text-center">
+                Keep this tab open and your screen on during delivery. Location is sent every ~15 seconds.
+            </p>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script src="rider.js"></script>
+</body>
+</html>

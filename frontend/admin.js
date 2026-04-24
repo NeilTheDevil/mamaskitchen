@@ -77,6 +77,12 @@ function renderOrders(orders) {
                             ${action.label}
                         </button>
                     ` : ''}
+                    ${o.status === 'out_for_delivery' ? `
+                        <button data-copy-rider="${o.order_number}"
+                            class="bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 flex-1">
+                            Copy rider link
+                        </button>
+                    ` : ''}
                     <button data-cancel="${o.order_number}"
                         class="bg-stone-100 text-stone-700 font-semibold py-2 px-4 rounded-lg hover:bg-stone-200 flex-1">
                         Cancel
@@ -91,6 +97,21 @@ function renderOrders(orders) {
     }));
     document.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => {
         if (confirm('Cancel this order?')) advance(b.getAttribute('data-cancel'), 'cancelled');
+    }));
+    document.querySelectorAll('[data-copy-rider]').forEach((b) => b.addEventListener('click', async () => {
+        const order = b.getAttribute('data-copy-rider');
+        const url = new URL('rider.html', location.href);
+        url.searchParams.set('o', order);
+        url.searchParams.set('key', adminKey);
+        const link = url.toString();
+        try {
+            await navigator.clipboard.writeText(link);
+            const orig = b.textContent;
+            b.textContent = 'Copied ✓';
+            setTimeout(() => { b.textContent = orig; }, 2000);
+        } catch {
+            prompt('Copy this link and send to your rider:', link);
+        }
     }));
 }
 

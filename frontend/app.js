@@ -28,8 +28,11 @@ if (document.getElementById('menu-grid')) {
     ];
 
     const CART_KEY = 'mk-cart-v1';
+    const PROFILE_KEY = 'mk-profile-v1';
     const loadCart = () => { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch { return {}; } };
     const saveCart = (c) => localStorage.setItem(CART_KEY, JSON.stringify(c));
+    const loadProfile = () => { try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch { return {}; } };
+    const saveProfile = (p) => localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
     let cart = loadCart();
 
     const $ = (id) => document.getElementById(id);
@@ -70,11 +73,17 @@ if (document.getElementById('menu-grid')) {
         const entries = Object.entries(cart).filter(([, q]) => q > 0);
         const count = entries.reduce((sum, [, q]) => sum + q, 0);
         $('cart-count').textContent = count;
+        const stickyMobile = $('cart-sticky-mobile');
+        const mobileCountEl = $('cart-count-mobile');
+        if (mobileCountEl) mobileCountEl.textContent = count === 1 ? '1 item' : `${count} items`;
 
         if (entries.length === 0) {
             $('cart-items').innerHTML = '<p class="text-stone-400 text-center py-12">Your cart is empty.</p>';
             $('cart-total').textContent = formatNaira(0);
             $('checkout-btn').disabled = true;
+            if (stickyMobile) stickyMobile.classList.add('translate-y-full');
+            const mt = $('cart-total-mobile');
+            if (mt) mt.textContent = formatNaira(0);
             return;
         }
 
@@ -103,6 +112,9 @@ if (document.getElementById('menu-grid')) {
 
         $('cart-total').textContent = formatNaira(total);
         $('checkout-btn').disabled = false;
+        const mobileTotal = $('cart-total-mobile');
+        if (mobileTotal) mobileTotal.textContent = formatNaira(total);
+        if (stickyMobile) stickyMobile.classList.remove('translate-y-full');
 
         $('cart-items').querySelectorAll('[data-inc]').forEach((b) => b.addEventListener('click', () => {
             const id = b.getAttribute('data-inc');
@@ -118,10 +130,17 @@ if (document.getElementById('menu-grid')) {
 
     $('cart-toggle').addEventListener('click', () => $('cart-panel').classList.remove('cart-hidden'));
     $('cart-close').addEventListener('click', () => $('cart-panel').classList.add('cart-hidden'));
+    const stickyEl = $('cart-sticky-mobile');
+    if (stickyEl) stickyEl.addEventListener('click', () => $('cart-panel').classList.remove('cart-hidden'));
 
     $('checkout-btn').addEventListener('click', () => {
         $('cart-panel').classList.add('cart-hidden');
         $('checkout-modal').classList.remove('hidden');
+        const profile = loadProfile();
+        const form = document.getElementById('checkout-form');
+        ['customer_name', 'customer_phone', 'delivery_address'].forEach((field) => {
+            if (profile[field] && !form.elements[field].value) form.elements[field].value = profile[field];
+        });
     });
     $('modal-close').addEventListener('click', () => $('checkout-modal').classList.add('hidden'));
 
@@ -150,13 +169,18 @@ if (document.getElementById('menu-grid')) {
                     items,
                 },
             });
+            saveProfile({
+                customer_name: form.get('customer_name'),
+                customer_phone: form.get('customer_phone'),
+                delivery_address: form.get('delivery_address'),
+            });
             cart = {};
             saveCart(cart);
             renderCart();
             $('checkout-modal').classList.add('hidden');
             $('success-modal').classList.remove('hidden');
             $('order-number').textContent = res.order_number;
-            $('track-link').href = `/track.html?o=${encodeURIComponent(res.order_number)}`;
+            $('track-link').href = `track.html?o=${encodeURIComponent(res.order_number)}`;
             e.target.reset();
         } catch (err) {
             alert('Could not place order: ' + err.message);

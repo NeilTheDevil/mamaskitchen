@@ -1,19 +1,19 @@
 {
-  "name": "Food: Update Order Status (POST /order-status?o=...)",
+  "name": "Food: Rider Ping (POST /rider-ping?o=...)",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "order-status",
+        "path": "rider-ping",
         "responseMode": "responseNode",
         "options": { "allowedOrigins": "https://neilthedevil.github.io" }
       },
-      "id": "fc25b901-2bc7-4b15-a8af-b3190470518b",
+      "id": "bb01aa11-2222-4b33-9c44-5d6677e88ff9",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [240, 300],
-      "webhookId": "52697f83-c2f8-47b8-8d55-e7ee655f990f"
+      "webhookId": "d5c0e1a7-6f8b-4b3a-9a5c-1e2f3a4b5c6d"
     },
     {
       "parameters": {
@@ -31,7 +31,7 @@
         },
         "options": {}
       },
-      "id": "1c4b372b-4613-4723-92f6-7a4a330ddad7",
+      "id": "aa11bb22-3333-4c44-9d55-6e7788f99a00",
       "name": "Check Auth",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -40,13 +40,13 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE orders\nSET status = $2, updated_at = NOW()\nWHERE order_number = $1\nRETURNING order_number, status, updated_at;",
+        "query": "UPDATE orders\nSET rider_lat = $2::numeric,\n    rider_lng = $3::numeric,\n    rider_location_updated_at = NOW()\nWHERE order_number = $1\nRETURNING order_number, rider_lat, rider_lng, rider_location_updated_at, status;",
         "options": {
-          "queryReplacement": "={{ $json.query.o }},={{ $json.body.status }}"
+          "queryReplacement": "={{ $json.query.o }},={{ $json.body.lat }},={{ $json.body.lng }}"
         }
       },
-      "id": "440ff838-0c90-47b1-9a20-bcb1fe43c445",
-      "name": "Update Status",
+      "id": "cc22dd33-4444-4e55-9f66-7a8899b00c11",
+      "name": "Update Ping",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [680, 200]
@@ -56,7 +56,7 @@
         "respondWith": "firstIncomingItem",
         "options": {}
       },
-      "id": "dfdf90d6-da92-4779-abb8-1ba86b17dec8",
+      "id": "dd33ee44-5555-4f66-9a77-8b99aa00cd22",
       "name": "Respond OK",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
@@ -68,7 +68,7 @@
         "responseBody": "={ \"error\": \"Unauthorized\" }",
         "options": { "responseCode": 401 }
       },
-      "id": "92b18ed4-a60b-4410-9c98-dbfb43e609a5",
+      "id": "ee44ff55-6666-4a77-9b88-9caabb00de33",
       "name": "Respond 401",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
@@ -81,11 +81,11 @@
     },
     "Check Auth": {
       "main": [
-        [{ "node": "Update Status", "type": "main", "index": 0 }],
+        [{ "node": "Update Ping", "type": "main", "index": 0 }],
         [{ "node": "Respond 401", "type": "main", "index": 0 }]
       ]
     },
-    "Update Status": {
+    "Update Ping": {
       "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
     }
   },

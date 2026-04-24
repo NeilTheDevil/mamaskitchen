@@ -6,7 +6,7 @@
         "httpMethod": "POST",
         "path": "order",
         "responseMode": "responseNode",
-        "options": { "allowedOrigins": "*" }
+        "options": { "allowedOrigins": "https://neilthedevil.github.io" }
       },
       "id": "dd1a2060-26e3-4e8b-a6e6-2de652713fc3",
       "name": "Webhook",

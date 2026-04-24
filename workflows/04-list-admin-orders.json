@@ -6,7 +6,7 @@
         "httpMethod": "GET",
         "path": "admin/orders",
         "responseMode": "responseNode",
-        "options": { "allowedOrigins": "*" }
+        "options": { "allowedOrigins": "https://neilthedevil.github.io" }
       },
       "id": "45659f74-d2b8-4db3-a720-08554b488b52",
       "name": "Webhook",
@@ -40,7 +40,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT order_number, customer_name, customer_phone, delivery_address, notes, items, total_amount, status, created_at, updated_at\nFROM orders\nORDER BY\n  CASE status\n    WHEN 'received' THEN 1\n    WHEN 'preparing' THEN 2\n    WHEN 'out_for_delivery' THEN 3\n    WHEN 'delivered' THEN 4\n    ELSE 5\n  END,\n  created_at DESC\nLIMIT 200;",
+        "query": "SELECT order_number, customer_name, customer_phone, delivery_address, notes, items, total_amount, status, created_at, updated_at, rider_lat, rider_lng, rider_location_updated_at\nFROM orders\nORDER BY\n  CASE status\n    WHEN 'received' THEN 1\n    WHEN 'preparing' THEN 2\n    WHEN 'out_for_delivery' THEN 3\n    WHEN 'delivered' THEN 4\n    ELSE 5\n  END,\n  created_at DESC\nLIMIT 200;",
         "options": {}
       },
       "id": "a1b2c3d4-e5f6-4789-0abc-def012345678",

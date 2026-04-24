@@ -55,6 +55,19 @@ sudo rm -f /tmp/food-frontend.tgz /tmp/remote-install.sh
 cd /opt/n8n
 sudo docker compose --env-file .env down
 sudo docker compose --env-file .env up -d
+
+# Apply init-db.sql against the live DB so schema changes (ADD COLUMN IF NOT
+# EXISTS, etc.) roll forward without wiping the volume. init-db.sql must stay
+# fully idempotent for this to be safe.
+set -a; source /opt/n8n/.env; set +a
+for i in $(seq 1 30); do
+    if sudo docker exec n8n-postgres-1 pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" > /dev/null 2>&1; then
+        break
+    fi
+    sleep 2
+done
+sudo docker exec -i n8n-postgres-1 psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" < /opt/n8n/init-db.sql > /dev/null
+echo "schema-sync: ok"
 REMOTE
 
 # ─────────────────────────────────────────────────────────

@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS orders (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS rider_lat NUMERIC(9, 6);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS rider_lng NUMERIC(9, 6);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS rider_location_updated_at TIMESTAMPTZ;
+
 CREATE INDEX IF NOT EXISTS idx_orders_status     ON orders (status);
 CREATE INDEX IF NOT EXISTS idx_orders_created    ON orders (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orders_number     ON orders (order_number);

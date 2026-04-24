@@ -6,7 +6,7 @@
         "httpMethod": "GET",
         "path": "order",
         "responseMode": "responseNode",
-        "options": { "allowedOrigins": "*" }
+        "options": { "allowedOrigins": "https://neilthedevil.github.io" }
       },
       "id": "55d9dfa7-ecc4-42f0-ae53-c6fd12d24f50",
       "name": "Webhook",
@@ -18,7 +18,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT order_number, customer_name, customer_phone, delivery_address, notes, items, total_amount, status, created_at, updated_at\nFROM orders\nWHERE order_number = $1\nLIMIT 1;",
+        "query": "SELECT order_number, customer_name, customer_phone, delivery_address, notes, items, total_amount, status, created_at, updated_at, rider_lat, rider_lng, rider_location_updated_at\nFROM orders\nWHERE order_number = $1\nLIMIT 1;",
         "options": {
           "queryReplacement": "={{ $json.query.o }}"
         }

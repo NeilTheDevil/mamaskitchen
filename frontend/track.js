@@ -8,6 +8,8 @@ const STATUS_COPY = {
 };
 
 let pollTimer = null;
+let map = null;
+let riderMarker = null;
 
 const $ = (id) => document.getElementById(id);
 
@@ -18,19 +20,57 @@ async function lookup(orderNumber) {
         render(order);
         if (pollTimer) clearInterval(pollTimer);
         if (order.status !== 'delivered' && order.status !== 'cancelled') {
+            const intervalMs = order.status === 'out_for_delivery' ? 10000 : 15000;
             pollTimer = setInterval(async () => {
                 try {
                     const fresh = await api(`/order?o=${encodeURIComponent(orderNumber)}`);
                     render(fresh);
                     if (fresh.status === 'delivered' || fresh.status === 'cancelled') clearInterval(pollTimer);
                 } catch { /* ignore transient errors */ }
-            }, 15000);
+            }, intervalMs);
         }
     } catch (err) {
         $('lookup-error').textContent = err.message || 'Order not found.';
         $('lookup-error').classList.remove('hidden');
         $('status-card').classList.add('hidden');
     }
+}
+
+function renderMap(order) {
+    const showMap = order.status === 'out_for_delivery' && order.rider_lat != null && order.rider_lng != null;
+    if (!showMap) {
+        $('map-section').classList.add('hidden');
+        return;
+    }
+    $('map-section').classList.remove('hidden');
+    const lat = Number(order.rider_lat);
+    const lng = Number(order.rider_lng);
+
+    if (!map) {
+        map = L.map('map', { zoomControl: true, attributionControl: true }).setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+        const riderIcon = L.divIcon({
+            className: 'rider-pin',
+            html: '<div style="background:#d97706;color:white;border-radius:9999px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.35);border:3px solid white">🛵</div>',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+        });
+        riderMarker = L.marker([lat, lng], { icon: riderIcon }).addTo(map);
+    } else {
+        riderMarker.setLatLng([lat, lng]);
+        map.panTo([lat, lng], { animate: true });
+    }
+
+    if (order.rider_location_updated_at) {
+        const secs = Math.max(0, Math.floor((Date.now() - new Date(order.rider_location_updated_at).getTime()) / 1000));
+        $('map-updated').textContent = secs < 60
+            ? `Updated ${secs}s ago`
+            : `Updated ${Math.floor(secs / 60)}m ${secs % 60}s ago`;
+    }
+    $('map-note').textContent = 'Live location from your rider, updated every ~15 seconds.';
 }
 
 function render(order) {
@@ -61,6 +101,8 @@ function render(order) {
         </li>
     `).join('');
     $('status-total').textContent = formatNaira(order.total_amount);
+
+    renderMap(order);
 }
 
 $('lookup-btn').addEventListener('click', () => {
