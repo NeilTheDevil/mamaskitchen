@@ -61,7 +61,11 @@ if (document.getElementById('menu-grid')) {
     }
 
     function renderCart() {
-        const entries = Object.entries(cart).filter(([, q]) => q > 0);
+        // Only count cart entries that still map to a menu item (defends against
+        // MENU not yet loaded and against stale localStorage entries whose ids
+        // were pruned by the bootstrap).
+        const entries = Object.entries(cart)
+            .filter(([id, q]) => q > 0 && MENU.some((m) => m.id === id));
         const count = entries.reduce((sum, [, q]) => sum + q, 0);
         $('cart-count').textContent = count;
         const stickyMobile = $('cart-sticky-mobile');
