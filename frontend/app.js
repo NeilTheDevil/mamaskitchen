@@ -196,6 +196,22 @@ if (document.getElementById('menu-grid')) {
                     emoji: it.emoji,
                     bg: it.bg,
                 }));
+
+            // Prune cart of items no longer on the menu (admin deleted, sold out,
+            // or customer's localStorage is from a previous menu version). Done
+            // once after MENU loads so renderCart never sees ghost entries.
+            const validIds = new Set(MENU.map((m) => m.id));
+            let pruned = false;
+            for (const id of Object.keys(cart)) {
+                if (!validIds.has(id)) { delete cart[id]; pruned = true; }
+            }
+            if (pruned) saveCart(cart);
+
+            if (MENU.length === 0) {
+                $('menu-loading-error').classList.remove('hidden');
+                $('menu-loading-error').textContent = 'No menu items available right now.';
+            }
+
             renderMenu();
             renderCart();
         } catch (err) {
