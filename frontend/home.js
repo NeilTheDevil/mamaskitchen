@@ -216,7 +216,35 @@ function renderFilters() {
         });
     });
 }
-function renderRestaurants() {}
+function renderRestaurants() {
+    $('restaurants-section').innerHTML = `
+        <div class="max-w-[1200px] mx-auto px-5 pb-6">
+            <h2 class="serif text-[22px] mb-3" style="color: var(--ink)">Near you tonight</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
+                ${RESTAURANTS.map((r) => `
+                    <a data-restaurant="${r.name}" href="menu.html" class="block group">
+                        <div class="photo w-full h-[150px] rounded-2xl mb-2.5"
+                            style="background-image: url('${r.src}'); border: 1px solid var(--rule);"></div>
+                        <div class="flex justify-between items-baseline mb-1">
+                            <div class="text-base font-semibold" style="color: var(--ink)">${r.name}</div>
+                            <div class="flex items-center gap-[3px] text-[13px] font-medium" style="color: var(--ink)">
+                                <i data-lucide="star" class="w-3 h-3" style="color: var(--accent); fill: var(--accent);"></i>
+                                <span>${r.rating}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5 text-xs" style="color: var(--ink-3)">
+                            <span>${r.tag}</span>
+                            <span class="w-[3px] h-[3px] rounded-full" style="background: var(--ink-3)"></span>
+                            <span>${r.eta}</span>
+                            <span class="w-[3px] h-[3px] rounded-full" style="background: var(--ink-3)"></span>
+                            <span>${r.fee} delivery</span>
+                        </div>
+                    </a>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
 function renderBottomNav() {}
 
 function initHome() {
