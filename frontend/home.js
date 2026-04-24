@@ -245,7 +245,57 @@ function renderRestaurants() {
         </div>
     `;
 }
-function renderBottomNav() {}
+function renderBottomNav() {
+    const TABS = [
+        { id: 'home',    icon: 'home',     label: 'Home',    active: true },
+        { id: 'explore', icon: 'compass',  label: 'Explore' },
+        { id: 'orders',  icon: 'shopping-bag', label: 'Orders' },
+        { id: 'saved',   icon: 'heart',    label: 'Saved' },
+        { id: 'me',      icon: 'user',     label: 'Me' },
+    ];
+
+    // Mobile: fixed bottom tab bar. Hidden on sm+ screens.
+    // Desktop/tablet: top nav row — we render it once in the same <nav> element but
+    // with responsive classes. Tailwind's sm: breakpoint (>=640px) swaps layouts.
+    $('bottom-nav').innerHTML = `
+        <!-- Mobile bottom tab bar -->
+        <div class="sm:hidden fixed bottom-0 left-0 right-0 grid grid-cols-5 px-2 py-2 pb-1"
+            style="background: var(--surface); border-top: 1px solid var(--rule); z-index: 40;">
+            ${TABS.map((t) => `
+                <button data-tab="${t.id}" type="button" class="flex flex-col items-center gap-0.5 py-1.5"
+                    style="color: ${t.active ? 'var(--accent)' : 'var(--ink-3)'};
+                           font-size: 10px; font-weight: ${t.active ? '600' : '500'};">
+                    <i data-lucide="${t.icon}" class="w-[22px] h-[22px]"></i>
+                    <span>${t.label}</span>
+                </button>
+            `).join('')}
+        </div>
+
+        <!-- Desktop/tablet top nav (sm+) -->
+        <div class="hidden sm:block sticky top-0 z-30" style="background: var(--bg); border-bottom: 1px solid var(--rule);">
+            <div class="max-w-[1200px] mx-auto px-5 py-3 flex items-center justify-between">
+                <a href="home.html" class="serif text-2xl" style="color: var(--ink)">Mama's Kitchen</a>
+                <div class="flex items-center gap-6">
+                    ${TABS.map((t) => `
+                        <button data-tab-desktop="${t.id}" type="button" class="flex items-center gap-1.5 text-sm font-medium hover:opacity-80"
+                            style="color: ${t.active ? 'var(--accent)' : 'var(--ink-2)'}; font-weight: ${t.active ? '600' : '500'};">
+                            <i data-lucide="${t.icon}" class="w-4 h-4"></i>
+                            <span>${t.label}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.querySelectorAll('[data-tab], [data-tab-desktop]').forEach((b) => {
+        b.addEventListener('click', () => {
+            const tab = b.getAttribute('data-tab') || b.getAttribute('data-tab-desktop');
+            if (tab === 'home') return;
+            console.log('tab clicked:', tab, '(placeholder — route not yet implemented)');
+        });
+    });
+}
 
 function initHome() {
     renderTopBar();
