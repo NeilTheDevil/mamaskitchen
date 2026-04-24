@@ -109,7 +109,63 @@ function renderSearch() {
         console.log('search opened (placeholder — not wired to a search page)');
     });
 }
-function renderHero() {}
+function renderHero() {
+    const last = getLastOrder();
+    if (!last) {
+        $('hero-section').innerHTML = '';
+        return;
+    }
+    // Last order shape (written by app.js after checkout):
+    //   { order_number, items: [...], total, timestamp, restaurant, summary, tracking_url }
+    const summary = last.summary || (last.items && last.items[0] ? last.items[0].name : 'your last order');
+    const restaurant = last.restaurant || 'Mama\'s Kitchen';
+    const total = formatNaira(last.total || 0);
+    const when = last.timestamp ? new Date(last.timestamp) : null;
+    const whenLabel = when
+        ? when.toLocaleDateString('en-NG', { weekday: 'short' }) + ' ' +
+          when.toLocaleTimeString('en-NG', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase().replace(' ', '')
+        : '';
+    const heroImg = FOOD.jollof;
+
+    $('hero-section').innerHTML = `
+        <div class="max-w-[720px] mx-auto px-5 pb-6">
+            <div class="flex items-center justify-between mb-2.5">
+                <h2 class="serif text-2xl leading-none" style="color: var(--ink)">Order it again?</h2>
+                ${whenLabel ? `<span class="mono text-[11px]" style="color: var(--ink-3)">${whenLabel}</span>` : ''}
+            </div>
+            <div class="rounded-[18px] overflow-hidden flex" style="background: var(--surface); border: 1px solid var(--rule);">
+                <div class="photo w-[120px] flex-shrink-0" style="background-image: url('${heroImg}')"></div>
+                <div class="flex-1 p-3.5 pl-4 flex flex-col justify-between min-w-0">
+                    <div>
+                        <div class="text-[15px] font-semibold truncate" style="color: var(--ink)">${summary}</div>
+                        <div class="text-xs mt-0.5" style="color: var(--ink-3)">from ${restaurant}</div>
+                        <div class="flex items-center gap-1.5 mt-2 text-[11px]" style="color: var(--ink-2)">
+                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                            <span>Arrives in 28 min</span>
+                        </div>
+                    </div>
+                    <button id="reorder-btn" type="button"
+                        class="mt-2.5 self-start rounded-full px-4 py-2 text-[13px] font-semibold hover:opacity-90 transition-opacity"
+                        style="background: var(--accent); color: var(--accent-ink); border: none;">
+                        Reorder · ${total}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    $('reorder-btn').addEventListener('click', () => {
+        const items = Array.isArray(last.items) ? last.items : [];
+        const cart = getCart();
+        for (const it of items) {
+            if (!it || !it.id) continue;
+            const q = Number(it.qty) || 1;
+            cart[it.id] = (cart[it.id] || 0) + q;
+        }
+        localStorage.setItem('mk-cart-v1', JSON.stringify(cart));
+        location.href = 'menu.html?checkout=1';
+    });
+}
 function renderCuisines() {}
 function renderFilters() {}
 function renderRestaurants() {}
