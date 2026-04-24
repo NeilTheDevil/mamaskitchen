@@ -94,7 +94,21 @@ function renderTopBar() {
         }
     });
 }
-function renderSearch() {}
+function renderSearch() {
+    $('search-section').innerHTML = `
+        <div class="max-w-[1200px] mx-auto px-5 pb-[18px]">
+            <button id="search-btn" type="button"
+                class="w-full flex items-center gap-2.5 px-4 py-3.5 rounded-[14px] text-left hover:opacity-95 transition-opacity"
+                style="background: var(--surface); border: 1px solid var(--rule); color: var(--ink-3); font-size: 14px;">
+                <i data-lucide="search" class="w-[18px] h-[18px]"></i>
+                <span>Search jollof, suya, egusi…</span>
+            </button>
+        </div>
+    `;
+    $('search-btn').addEventListener('click', () => {
+        console.log('search opened (placeholder — not wired to a search page)');
+    });
+}
 function renderHero() {}
 function renderCuisines() {}
 function renderFilters() {}
