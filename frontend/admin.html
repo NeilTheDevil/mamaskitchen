@@ -27,6 +27,12 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-6 py-8">
+        <div class="flex gap-2 mb-6 border-b border-stone-300">
+            <button data-tab="orders" class="tab-btn px-4 py-2 font-semibold border-b-2 border-amber-600 text-amber-700">Orders</button>
+            <button data-tab="menu" class="tab-btn px-4 py-2 font-semibold border-b-2 border-transparent text-stone-500 hover:text-stone-800">Menu</button>
+        </div>
+
+        <section id="tab-orders">
         <div id="auth-warning" class="hidden bg-rose-100 border border-rose-300 text-rose-900 p-4 rounded-lg mb-6">
             <p class="font-semibold">Missing admin key.</p>
             <p class="text-sm mt-1">Open this page as <code class="bg-rose-200 px-1 rounded">admin.html?key=YOUR_ADMIN_SECRET</code>.</p>
@@ -54,6 +60,65 @@
         <h2 class="brand-font text-2xl font-bold mb-4">Active orders</h2>
         <div id="orders-list" class="space-y-4">
             <p id="empty-state" class="text-stone-500 text-center py-12">Loading...</p>
+        </div>
+        </section>
+
+        <section id="tab-menu" class="hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="brand-font text-2xl font-bold">Menu items</h2>
+                <button id="menu-add-btn" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-lg">+ Add item</button>
+            </div>
+            <div id="menu-list" class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <p class="p-6 text-stone-500 text-center">Loading menu...</p>
+            </div>
+        </section>
+
+        <div id="item-modal" class="hidden fixed inset-0 bg-stone-900/60 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between p-5 border-b">
+                    <h3 id="item-modal-title" class="brand-font text-2xl font-bold">Add item</h3>
+                    <button id="item-modal-close" class="text-stone-500 hover:text-stone-900 text-2xl leading-none">&times;</button>
+                </div>
+                <form id="item-form" class="p-5 space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Id <span class="text-stone-400">(slug, lowercase-dashed)</span></label>
+                        <input name="id" required pattern="[a-z0-9-]+" class="w-full border border-stone-300 rounded-lg px-3 py-2 font-mono text-sm" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Name</label>
+                        <input name="name" required minlength="2" class="w-full border border-stone-300 rounded-lg px-3 py-2" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Description</label>
+                        <textarea name="description" rows="2" class="w-full border border-stone-300 rounded-lg px-3 py-2"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Price (₦)</label>
+                            <input name="price" type="number" min="0" step="50" required class="w-full border border-stone-300 rounded-lg px-3 py-2" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Sort order</label>
+                            <input name="sort_order" type="number" value="100" class="w-full border border-stone-300 rounded-lg px-3 py-2" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Emoji</label>
+                            <input name="emoji" maxlength="4" placeholder="🍛" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-2xl text-center" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">BG (Tailwind)</label>
+                            <input name="bg" placeholder="from-rose-400 to-orange-500" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm" />
+                        </div>
+                    </div>
+                    <label class="flex items-center gap-2">
+                        <input name="available" type="checkbox" checked class="w-4 h-4" />
+                        <span class="text-sm">Available to customers</span>
+                    </label>
+                    <button type="submit" id="item-save-btn" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg">Save</button>
+                </form>
+            </div>
         </div>
     </main>
 
