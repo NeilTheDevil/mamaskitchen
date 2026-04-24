@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mama's Kitchen — Home</title>
+    <meta name="description" content="Nigerian home-cooked meals, delivered fast." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --bg:          oklch(18% 0.018 45);
+            --surface:     oklch(24% 0.022 45);
+            --surface-2:   oklch(30% 0.020 45);
+            --rule:        oklch(32% 0.020 45);
+            --ink:         oklch(93% 0.020 80);
+            --ink-2:       oklch(80% 0.020 75);
+            --ink-3:       oklch(60% 0.020 75);
+            --accent:      oklch(72% 0.16 45);
+            --accent-ink:  #ffffff;
+        }
+        html, body {
+            margin: 0; padding: 0;
+            background: var(--bg); color: var(--ink);
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+        .mono  { font-family: 'Geist Mono', ui-monospace, monospace; }
+        .photo {
+            background-size: cover;
+            background-position: center;
+            background-color: #2a2520;
+        }
+        .pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 12px; border-radius: 999px;
+            font-size: 12px; font-weight: 500;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        .scroll-x { overflow-x: auto; scrollbar-width: none; }
+        .scroll-x::-webkit-scrollbar { display: none; }
+        /* Lucide icons inherit current color by default */
+        .lucide { flex-shrink: 0; }
+    </style>
+</head>
+<body>
+    <div id="home-root" class="min-h-screen flex flex-col">
+        <!-- Top bar (task 4) -->
+        <header id="top-bar"></header>
+
+        <main class="flex-1 pb-24 sm:pb-8">
+            <!-- Sections rendered in order:
+                 - Search (task 5)
+                 - Hero "Order it again?" (task 6)
+                 - Cuisines rail (task 7)
+                 - Filter chips (task 8)
+                 - Near you tonight (task 9) -->
+            <section id="search-section"></section>
+            <section id="hero-section"></section>
+            <section id="cuisines-section"></section>
+            <section id="filters-section"></section>
+            <section id="restaurants-section"></section>
+        </main>
+
+        <!-- Bottom tab bar mobile / top nav desktop (task 10) -->
+        <nav id="bottom-nav"></nav>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="home.js"></script>
+</body>
+</html>
