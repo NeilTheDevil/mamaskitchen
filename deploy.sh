@@ -131,10 +131,12 @@ CRED_PAYLOAD=$(jq -n \
        data: { host: $host, port: $port, database: $database, user: $user, password: $password,
                ssl: "disable", allowUnauthorizedCerts: false, sshTunnel: false } }')
 
+CRED_FILE="$TMPDIR/cred-payload.json"
+printf '%s' "$CRED_PAYLOAD" > "$CRED_FILE"
 CRED_RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST "${N8N_API_URL}/api/v1/credentials" \
     -H "X-N8N-API-KEY: ${N8N_API_KEY}" \
-    -H "Content-Type: application/json" \
-    -d "$CRED_PAYLOAD")
+    -H "Content-Type: application/json; charset=utf-8" \
+    --data-binary "@$CRED_FILE")
 CRED_CODE=$(printf '%s' "$CRED_RESPONSE" | tail -n1)
 CRED_BODY=$(printf '%s' "$CRED_RESPONSE" | sed '$d')
 
@@ -172,10 +174,12 @@ for wf in workflows/*.json; do
             -H "X-N8N-API-KEY: ${N8N_API_KEY}" > /dev/null
     fi
 
+    PATCHED_FILE="$TMPDIR/patched-$(basename "$wf")"
+    printf '%s' "$PATCHED" > "$PATCHED_FILE"
     WF_ID=$(curl -fsS -X POST "${N8N_API_URL}/api/v1/workflows" \
         -H "X-N8N-API-KEY: ${N8N_API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d "$PATCHED" | jq -r '.id')
+        -H "Content-Type: application/json; charset=utf-8" \
+        --data-binary "@$PATCHED_FILE" | jq -r '.id')
 
     curl -fsS -X POST "${N8N_API_URL}/api/v1/workflows/${WF_ID}/activate" \
         -H "X-N8N-API-KEY: ${N8N_API_KEY}" > /dev/null
