@@ -166,7 +166,30 @@ function renderHero() {
         location.href = 'menu.html?checkout=1';
     });
 }
-function renderCuisines() {}
+function renderCuisines() {
+    $('cuisines-section').innerHTML = `
+        <div class="max-w-[1200px] mx-auto pb-6">
+            <div class="px-5 pb-3 flex items-baseline justify-between">
+                <h2 class="serif text-[22px]" style="color: var(--ink)">Cuisines</h2>
+                <span class="text-xs" style="color: var(--ink-3)">See all</span>
+            </div>
+            <div class="scroll-x flex gap-3 px-5">
+                ${CATEGORIES.map((c) => `
+                    <button data-cuisine="${c.label}" type="button" class="flex-shrink-0 text-center w-[72px] hover:opacity-90 transition-opacity">
+                        <div class="photo w-[72px] h-[72px] rounded-2xl mb-1.5"
+                            style="background-image: url('${c.src}'); border: 1px solid var(--rule);"></div>
+                        <div class="text-xs font-medium" style="color: var(--ink)">${c.label}</div>
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    document.querySelectorAll('[data-cuisine]').forEach((b) => {
+        b.addEventListener('click', () => {
+            console.log('cuisine filter:', b.getAttribute('data-cuisine'), '(placeholder — no filter page yet)');
+        });
+    });
+}
 function renderFilters() {}
 function renderRestaurants() {}
 function renderBottomNav() {}
