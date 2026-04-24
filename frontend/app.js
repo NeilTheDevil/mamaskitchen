@@ -16,16 +16,7 @@ const formatNaira = (n) => '₦' + Number(n).toLocaleString('en-NG', { maximumFr
 const formatTime = (iso) => new Date(iso).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' });
 
 if (document.getElementById('menu-grid')) {
-    const MENU = [
-        { id: 'jollof-chicken',    name: 'Jollof Rice & Chicken',  desc: 'Smoky party jollof with grilled chicken', price: 3500, emoji: '🍛', bg: 'from-rose-400 to-orange-500' },
-        { id: 'fried-rice-beef',   name: 'Fried Rice & Beef',      desc: 'Veggie-loaded fried rice with tender beef', price: 3200, emoji: '🍚', bg: 'from-amber-400 to-lime-500' },
-        { id: 'amala-ewedu',       name: 'Amala & Ewedu',          desc: 'Yam flour swallow with ewedu and stew',    price: 2800, emoji: '🥣', bg: 'from-emerald-400 to-teal-500' },
-        { id: 'pounded-yam-egusi', name: 'Pounded Yam & Egusi',    desc: 'Soft pounded yam with melon seed soup',    price: 3000, emoji: '🫕', bg: 'from-yellow-400 to-amber-500' },
-        { id: 'suya-platter',      name: 'Suya Platter',           desc: 'Spicy grilled beef, onions & yaji',        price: 4000, emoji: '🍢', bg: 'from-red-500 to-rose-600' },
-        { id: 'moi-moi',           name: 'Moi Moi',                desc: 'Steamed beans pudding with egg & fish',    price: 1500, emoji: '🥮', bg: 'from-orange-400 to-red-500' },
-        { id: 'puff-puff',         name: 'Puff Puff (10 pcs)',     desc: 'Soft, golden, dusted with sugar',          price: 1000, emoji: '🍩', bg: 'from-pink-400 to-rose-500' },
-        { id: 'zobo',              name: 'Zobo Drink (500ml)',     desc: 'Hibiscus drink with ginger & pineapple',   price: 800,  emoji: '🥤', bg: 'from-fuchsia-500 to-purple-600' },
-    ];
+    let MENU = [];
 
     const CART_KEY = 'mk-cart-v1';
     const PROFILE_KEY = 'mk-profile-v1';
@@ -192,6 +183,25 @@ if (document.getElementById('menu-grid')) {
 
     $('new-order-btn').addEventListener('click', () => $('success-modal').classList.add('hidden'));
 
-    renderMenu();
-    renderCart();
+    (async function bootstrap() {
+        try {
+            const data = await api('/menu');
+            MENU = (data.items || [])
+                .filter((it) => it.available)
+                .map((it) => ({
+                    id: it.id,
+                    name: it.name,
+                    desc: it.description || '',
+                    price: Number(it.price),
+                    emoji: it.emoji,
+                    bg: it.bg,
+                }));
+            renderMenu();
+            renderCart();
+        } catch (err) {
+            $('menu-loading-error').classList.remove('hidden');
+            $('menu-loading-error').textContent = 'Menu unavailable: ' + err.message;
+            renderCart();
+        }
+    })();
 }
